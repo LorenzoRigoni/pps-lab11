@@ -45,3 +45,33 @@ split([H | T], E, LTemp, L1, L2) :-
 	NE is E - 1, %Decrement counter 
 	append(LTemp, [H], LRes), %Append new element to the first sublist
 	split(T, NE, LRes, L1, L2). %Check if counter is 0
+
+% 1.7: rotate(+List, -RotatedList)
+
+rotate([H | T], RL) :- rotate(T, H, RL).
+rotate([], H, [H]).
+rotate([H | T], N, [H | RL]) :- rotate(T, N, RL).
+
+% 1.8: count_occurrences (+Element, +List, -Count)
+
+count_occurrences(E, [], 0).
+count_occurrences(E, [H | T], C) :- H = E, ! , count_occurrences(E, T, CS), C is CS + 1.
+count_occurrences(E, [H | T], C) :- count_occurrences(E, T, C).
+
+% 1.9: dice(-X)
+
+dice(X) :- dice(1, 6, X).
+dice(S, _, S).
+dice(C, M, X) :- C < M, N is C + 1, dice(N, M, X).
+
+% 1.10: three_dice(-L)
+
+three_dice([D1, D2, D3]) :- dice(D1), dice(D2), dice(D3).
+
+% 1.11: distinct(+List, -DistinctList)
+
+distinct(L, DL) :- distinct(L, [], DL).
+
+distinct([], _, []).
+distinct([H | T], Seen, R) :- member(H, Seen), !, distinct(T, Seen, R).
+distinct([H | T], Seen, [H | R]) :- distinct(T, [H | Seen], R).
