@@ -75,3 +75,45 @@ distinct(L, DL) :- distinct(L, [], DL).
 distinct([], _, []).
 distinct([H | T], Seen, R) :- member(H, Seen), !, distinct(T, Seen, R).
 distinct([H | T], Seen, [H | R]) :- distinct(T, [H | Seen], R).
+
+% Part 2: basic cut operations
+
+% 2.1: dropAny(?Elem, ?List, ?OutList)
+
+dropAny(X, [X | T ], T).
+dropAny(X, [H | Xs], [H | L]) :- dropAny(X, Xs, L).
+
+% 2.2: other drops
+
+% drop_first(?Elem, ?List, ?OutList)
+
+drop_first(X, [X | T], T) :- !.
+drop_first(X, [H | T], R) :- drop_first(X, T, R).
+
+% drop_last(?Elem, ?List, ?OutList)
+
+drop_last(X, [X], []) :- !.
+drop_last(X, [X | T], [X | L]) :- drop_last(X, T, L), !.
+drop_last(X, [H | T], [H | L]) :- drop_last(X, T, L).
+
+% drop_all(?Elem, ?List, ?OutList)
+
+drop_all(_, [], []).
+drop_all(X, [X | T], L) :- !, drop_all(X, T, L).
+drop_all(X, [H | T], [H | L]) :- drop_all(X, T, L).
+
+% Part 3: Operations on graph
+
+% 3.1: fromList(+List, -Graph)
+
+fromList ([_], []) .
+fromList ([H1, H2 | T], [e(H1, H2) | L]) :- fromList([H2 | T], L).
+
+% 3.2: out_degree(+Graph, +Node, -Deg)
+
+out_degree([], _, 0).
+out_degree([e(N, _) | T], N, D) :- !, out_degree(T, N, PartialD), D is PartialD + 1.
+out_degree([_ | T], N, D) :- out_degree(T, N, D).
+
+% 3.3: reaching(+Graph, +Node, -List)
+
