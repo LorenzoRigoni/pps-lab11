@@ -55,7 +55,7 @@ rotate([H | T], N, [H | RL]) :- rotate(T, N, RL).
 % 1.8: count_occurrences (+Element, +List, -Count)
 
 count_occurrences(E, [], 0).
-count_occurrences(E, [H | T], C) :- H = E, ! , count_occurrences(E, T, CS), C is CS + 1.
+count_occurrences(E, [E | T], C) :- !, count_occurrences(E, T, CS), C is CS + 1.
 count_occurrences(E, [H | T], C) :- count_occurrences(E, T, C).
 
 % 1.9: dice(-X)
@@ -117,3 +117,24 @@ out_degree([_ | T], N, D) :- out_degree(T, N, D).
 
 % 3.3: reaching(+Graph, +Node, -List)
 
+reaching(G, N, L) :- findall(To, member(e(N, To), G), L).
+
+% 3.4: nodes(+Graph, -Nodes)
+
+nodes(G, N) :- nodes(G, [], N).
+nodes([], L, N) :- distinct(L, N).
+nodes([e(N1, N2) | T], L, N) :- append(L, [N1], LTemp), append(LTemp, [N2], LRes), nodes(T, LRes, N).
+
+% 3.5: anypath(+Graph, +Node1, +Node2, -ListPath)
+
+anypath(G, N1, N2, L) :- path(G, N1, N2, [], L).
+
+path(_, N2, N2, V, L) :- reverse(V, L).
+path(G, C, N2, V, L) :- 
+	member(e(C, Next), G), 
+	\+ member(e(C, Next), V), % no loop 
+	path(G, Next, N2, [e(C, Next) | V], L).
+
+% 3.6: allreaching(+Graph, +Node, -List)
+
+allreaching(G, N, L) :- findall(To, (member(e(_, To), G), anypath(G, N, To, _), N \= To), L).
